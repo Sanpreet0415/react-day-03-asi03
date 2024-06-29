@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz App</title>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    // Quiz component
+    const Quiz = () => {
+      // State for questions and answers
+      const [questions, setQuestions] = React.useState([
+        {
+          question: "What is the capital of France?",
+          answers: ["Paris", "Berlin", "London", "Madrid"],
+          correctAnswer: "Paris",
+          selectedAnswer: null,
+        },
+        {
+          question: "Who wrote 'Hamlet'?",
+          answers: ["Shakespeare", "Dickens", "Tolstoy", "Hemingway"],
+          correctAnswer: "Shakespeare",
+          selectedAnswer: null,
+        },
+        {
+          question: "Which planet is known as the Red Planet?",
+          answers: ["Mars", "Jupiter", "Saturn", "Uranus"],
+          correctAnswer: "Mars",
+          selectedAnswer: null,
+        },
+      ]);
+
+      // State to manage quiz completion and score display
+      const [quizCompleted, setQuizCompleted] = React.useState(false);
+      const [score, setScore] = React.useState(0);
+
+      // Function to handle selecting an answer
+      const handleAnswerSelect = (questionIndex, answer) => {
+        const updatedQuestions = [...questions];
+        updatedQuestions[questionIndex].selectedAnswer = answer;
+        setQuestions(updatedQuestions);
+      };
+
+      // Function to handle quiz submission
+      const handleSubmit = () => {
+        // Calculate score based on selected answers
+        let calculatedScore = 0;
+        questions.forEach((question) => {
+          if (question.selectedAnswer === question.correctAnswer) {
+            calculatedScore++;
+          }
+        });
+        // Update state with score and mark quiz as completed
+        setScore(calculatedScore);
+        setQuizCompleted(true);
+      };
+
+      // Function to restart the quiz
+      const restartQuiz = () => {
+        // Reset question selected answers and quiz state
+        const resetQuestions = questions.map((question) => ({
+          ...question,
+          selectedAnswer: null,
+        }));
+        setQuestions(resetQuestions);
+        setScore(0);
+        setQuizCompleted(false);
+      };
+
+      return (
+        <div>
+          {!quizCompleted ? (
+            <form onSubmit={(e) => e.preventDefault()}>
+              <h1>Quiz</h1>
+              {questions.map((question, index) => (
+                <div key={index}>
+                  <p>{question.question}</p>
+                  {question.answers.map((answer, answerIndex) => (
+                    <label key={answerIndex}>
+                      <input
+                        type="radio"
+                        name={`question${index}`}
+                        value={answer}
+                        checked={question.selectedAnswer === answer}
+                        onChange={() => handleAnswerSelect(index, answer)}
+                      />
+                      {answer}
+                    </label>
+                  ))}
+                </div>
+              ))}
+              <button type="button" onClick={handleSubmit}>Submit</button>
+            </form>
+          ) : (
+            <div>
+              <h1>Your Score</h1>
+              <p>{score} out of {questions.length}</p>
+              <button type="button" onClick={restartQuiz}>Restart Quiz</button>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // Render the Quiz component into the root div
+    const rootElement = document.getElementById("root");
+    ReactDOM.render(<Quiz />, rootElement);
+  </script>
+</body>
+</html>
